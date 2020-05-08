@@ -5,6 +5,8 @@
 #include "Perception/PawnSensingComponent.h"
 #include "DrawDebugHelpers.h"
 #include "TimerManager.h"
+#include "Engine/World.h"
+#include "FPSProjectGameMode.h"
 
 // Sets default values
 AFPSAIGuard::AFPSAIGuard()
@@ -35,6 +37,17 @@ void AFPSAIGuard::OnPawnSeen(APawn* SeenPawn)
 	}
 
 	DrawDebugSphere(GetWorld(), SeenPawn->GetActorLocation(), 64.f, 8, FColor::Green, false, 2.f);
+
+	// When the player is found, game is over
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		AFPSProjectGameMode* GM = Cast<AFPSProjectGameMode>(World->GetAuthGameMode());
+		if (GM)
+		{
+			GM->CompleteMission(SeenPawn, false);
+		}
+	}
 }
 
 void AFPSAIGuard::OnNoiseHeard(APawn* NoiseInstigator, const FVector& Location, float Volume)
