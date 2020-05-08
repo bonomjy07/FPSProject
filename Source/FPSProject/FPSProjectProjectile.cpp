@@ -33,6 +33,8 @@ AFPSProjectProjectile::AFPSProjectProjectile()
 
 void AFPSProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	MakeNoise(1.f, Instigator, GetActorLocation());
+
 	// Only add impulse and destroy projectile if we hit a physics
 	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
 	{
@@ -40,4 +42,5 @@ void AFPSProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherAct
 
 		Destroy();
 	}
+
 }
