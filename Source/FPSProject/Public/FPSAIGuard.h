@@ -28,11 +28,22 @@ protected:
 	UFUNCTION()
 	void OnNoiseHeard(APawn* NoiseInstigator, const FVector& Location, float Volume);
 
+	// It's used to make AI look where it was looking at
+	FRotator OriginalRotation;
+
+	// Timer for resetting AI's rotation
+	FTimerHandle RotationTimer;
+
+	// Called when the AI heard noise after 3 seconds
+	UFUNCTION()
+	void ResetOriginalRotation();
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
 
 };
