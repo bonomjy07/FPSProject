@@ -54,7 +54,7 @@ AFPSProjectCharacter::AFPSProjectCharacter()
 	GunOffset = FVector(100.0f, 0.0f, 10.0f);
 
 	// Create a noise emitter component
-	NoiseEmitterComponent = CreateDefaultSubobject<UNoiseEmitterComponent>(TEXT("NoiseEmitter"));
+	NoiseEmitterComponent = CreateDefaultSubobject<UPawnNoiseEmitterComponent>(TEXT("NoiseEmitter"));
 }
 
 void AFPSProjectCharacter::BeginPlay()

@@ -29,8 +29,8 @@ class AFPSProjectCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FirstPersonCameraComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
-	class UNoiseEmitterComponent* NoiseEmitterComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI", meta = (AllowPrivateAccess = "true"))
+	UPawnNoiseEmitterComponent* NoiseEmitterComponent;
 
 public:
 	AFPSProjectCharacter();
