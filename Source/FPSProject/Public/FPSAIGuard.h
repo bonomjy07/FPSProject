@@ -26,7 +26,7 @@ protected:
 	void OnPawnSeen(APawn* SeenPawn);
 
 	UFUNCTION()
-	void OnNoiseHeard(APawn* Instigator, const FVector& Location, float Volume);
+	void OnNoiseHeard(APawn* NoiseInstigator, const FVector& Location, float Volume);
 
 public:	
 	// Called every frame
