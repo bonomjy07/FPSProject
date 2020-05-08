@@ -6,6 +6,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
+#include "Components/PawnNoiseEmitterComponent.h"
 #include "GameFramework/InputSettings.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
@@ -51,6 +52,9 @@ AFPSProjectCharacter::AFPSProjectCharacter()
 
 	// Default offset from the character location for projectiles to spawn
 	GunOffset = FVector(100.0f, 0.0f, 10.0f);
+
+	// Create a noise emitter component
+	NoiseEmitterComponent = CreateDefaultSubobject<UNoiseEmitterComponent>(TEXT("NoiseEmitter"));
 }
 
 void AFPSProjectCharacter::BeginPlay()
