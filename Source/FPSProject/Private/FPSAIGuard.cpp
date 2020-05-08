@@ -14,9 +14,13 @@ AFPSAIGuard::AFPSAIGuard()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
+	// Create pawn sensing component
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensingComp"));
 	PawnSensingComp->OnSeePawn.AddDynamic(this, &AFPSAIGuard::OnPawnSeen);
 	PawnSensingComp->OnHearNoise.AddDynamic(this, &AFPSAIGuard::OnNoiseHeard);
+
+	// Set default guard state
+	GuardState = EAIGuardState::Idle;
 }
 
 // Called when the game starts or when spawned
@@ -26,7 +30,6 @@ void AFPSAIGuard::BeginPlay()
 
 	// Save the its orginal rotation
 	OriginalRotation = GetActorRotation();
-	
 }
 
 void AFPSAIGuard::OnPawnSeen(APawn* SeenPawn)
@@ -36,7 +39,11 @@ void AFPSAIGuard::OnPawnSeen(APawn* SeenPawn)
 		return;
 	}
 
+	// Debug ...
 	DrawDebugSphere(GetWorld(), SeenPawn->GetActorLocation(), 64.f, 8, FColor::Green, false, 2.f);
+
+	// State is alert
+	SetGuardState(EAIGuardState::Alert);
 
 	// When the player is found, game is over
 	UWorld* World = GetWorld();
@@ -52,7 +59,16 @@ void AFPSAIGuard::OnPawnSeen(APawn* SeenPawn)
 
 void AFPSAIGuard::OnNoiseHeard(APawn* NoiseInstigator, const FVector& Location, float Volume)
 {
+	// Debug ...
 	DrawDebugSphere(GetWorld(), Location, 64.f, 8, FColor::Red, false, 2.f);
+
+	// Player is already caught, No turning back
+	if (GuardState == EAIGuardState::Alert)
+	{
+		return;
+	}
+
+	SetGuardState(EAIGuardState::Suspicious);
 
 	// Get direction
 	FVector Direction = Location - GetActorLocation();
@@ -69,6 +85,14 @@ void AFPSAIGuard::OnNoiseHeard(APawn* NoiseInstigator, const FVector& Location, 
 
 void AFPSAIGuard::ResetOriginalRotation()
 {
+	// Player is already caught, No turning back
+	if (GuardState == EAIGuardState::Alert)
+	{
+		return;
+	}
+
+	SetGuardState(EAIGuardState::Idle);
+
 	SetActorRotation(OriginalRotation);
 }
 
@@ -84,5 +108,12 @@ void AFPSAIGuard::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void AFPSAIGuard::SetGuardState(EAIGuardState NewGuardState)
+{
+	GuardState = NewGuardState;
+
+	OnGuardStateChanged(NewGuardState);
 }
 
