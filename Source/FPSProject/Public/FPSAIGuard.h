@@ -6,6 +6,14 @@
 #include "GameFramework/Character.h"
 #include "FPSAIGuard.generated.h"
 
+UENUM(BlueprintType)
+enum class EAIGuardState : uint8
+{
+	Idle,
+	Suspicious,
+	Alert
+};
+
 UCLASS()
 class FPSPROJECT_API AFPSAIGuard : public ACharacter
 {
@@ -38,6 +46,12 @@ protected:
 	UFUNCTION()
 	void ResetOriginalRotation();
 
+	// This represetns guard state
+	EAIGuardState GuardState;
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "AI")
+	void OnGuardStateChanged(EAIGuardState NewGuardState);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -45,5 +59,6 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-
+	// Setter for guard state
+	void SetGuardState(EAIGuardState NewGuardState);
 };
