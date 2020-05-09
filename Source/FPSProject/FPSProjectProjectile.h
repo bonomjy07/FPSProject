@@ -30,5 +30,12 @@ public:
 	FORCEINLINE class USphereComponent* GetCollisionComp() const { return CollisionComp; }
 	/** Returns ProjectileMovement subobject **/
 	FORCEINLINE class UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
+
+public:
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	class UParticleSystem* OnHitParticle;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	class USoundBase* OnHitSound;
 };
 

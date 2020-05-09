@@ -3,6 +3,8 @@
 #include "FPSProjectProjectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Particles/ParticleSystem.h"
 
 AFPSProjectProjectile::AFPSProjectProjectile() 
 {
@@ -40,7 +42,14 @@ void AFPSProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherAct
 	{
 		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
 
-		Destroy();
+		//Destroy();
 	}
 
+	if (OnHitParticle)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), OnHitParticle, GetActorLocation());
+		UGameplayStatics::PlaySound2D(this, OnHitSound);
+	}
+
+	Destroy();
 }
