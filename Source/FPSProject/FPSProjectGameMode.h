@@ -12,17 +12,15 @@ class AFPSProjectGameMode : public AGameModeBase
 	GENERATED_BODY()
 
 protected:
+	/** Player's view target will be this if game is somehow over */
 	UPROPERTY(EditDefaultsOnly, Category = "Spectator")
 	TSubclassOf<AActor> ViewTargetClass;
 
 public:
 	AFPSProjectGameMode();
 
+	/** Finish the current game */
 	void CompleteMission(APawn* InstigatorPawn, bool bIsMissionSuccess);
-
-	UFUNCTION(BlueprintImplementableEvent, Category = "GameMode")
-	void OnMissionCompleted(APawn* InstigatorPawn, bool bIsMissionSuccess);
-
 };
 
 

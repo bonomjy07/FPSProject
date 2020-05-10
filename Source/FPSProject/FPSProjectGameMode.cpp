@@ -5,6 +5,8 @@
 #include "FPSProjectCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Kismet/GameplayStatics.h"
+#include "FPSProjectGameStateBase.h"
+#include "Engine/World.h"
 
 AFPSProjectGameMode::AFPSProjectGameMode()
 	: Super()
@@ -15,31 +17,36 @@ AFPSProjectGameMode::AFPSProjectGameMode()
 
 	// use our custom HUD class
 	HUDClass = AFPSProjectHUD::StaticClass();
+
+	// Let game mode know the game state class
+	GameStateClass = AFPSProjectGameStateBase::StaticClass();
 }
 
 void AFPSProjectGameMode::CompleteMission(APawn* InstigatorPawn, bool bIsMissionSuccess)
 {
-	if (InstigatorPawn)
+	// Change the player's view point target
+	if (ViewTargetClass)
 	{
-		// Disable the player's input
-		InstigatorPawn->DisableInput(nullptr);
-
-		// Change the player's view point target
-		if (ViewTargetClass)
+		if (AActor* ViewTarget = UGameplayStatics::GetActorOfClass(this, ViewTargetClass))
 		{
-			if (AActor* ViewTarget = UGameplayStatics::GetActorOfClass(this, ViewTargetClass))
+			for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
 			{
-				if (APlayerController* PC = Cast<APlayerController>(InstigatorPawn->GetController()))
+				APlayerController* PC = It->Get();
+				if (PC)
 				{
 					PC->SetViewTargetWithBlend(ViewTarget, 0.5f, EViewTargetBlendFunction::VTBlend_Cubic);
 				}
 			}
 		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("View Target Class for new spector is not valid, Please update the class in BP_GameMode"));
-		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("View Target Class for new spector is not valid, Please update the class in BP_GameMode"));
 	}
 
-	OnMissionCompleted(InstigatorPawn, bIsMissionSuccess);
+	AFPSProjectGameStateBase* GS = GetGameState<AFPSProjectGameStateBase>();
+	if (GS)
+	{
+		GS->MulticastOnMissionCompleted(InstigatorPawn, bIsMissionSuccess);
+	}
 }
