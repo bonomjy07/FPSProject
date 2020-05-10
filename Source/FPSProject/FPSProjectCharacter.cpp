@@ -12,6 +12,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "MotionControllerComponent.h"
 #include "XRMotionControllerBase.h" // for FXRMotionControllerBase::RightHandSourceId
+#include "Net/UnrealNetwork.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
@@ -102,29 +103,16 @@ void AFPSProjectCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void AFPSProjectCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AFPSProjectCharacter, bIsCarryObjective);
+}
+
 void AFPSProjectCharacter::OnFire()
 {
 	ServerOnFire();
-
-//	// try and fire a projectile
-//	if (ProjectileClass != NULL)
-//	{
-//		UWorld* const World = GetWorld();
-//		if (World != NULL)
-//		{
-//			const FRotator SpawnRotation = GetControlRotation();
-//			// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
-//			const FVector SpawnLocation = ((FP_MuzzleLocation != nullptr) ? FP_MuzzleLocation->GetComponentLocation() : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
-//
-//			//Set Spawn Collision Handling Override
-//			FActorSpawnParameters ActorSpawnParams;
-//			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-//			ActorSpawnParams.Instigator = this;
-//
-//			// spawn the projectile at the muzzle
-//			World->SpawnActor<AFPSProjectProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
-//		}
-//	}
 
 	// try and play the sound if specified
 	if (FireSound != NULL)

@@ -55,7 +55,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	class UAnimMontage* FireAnimation;
 
-	UPROPERTY(BlueprintReadOnly, Category = Gameplay)
+	/** true if the actor has ObjectiveActor, otherwise false */
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = Gameplay)
 	bool bIsCarryObjective;
 
 protected:
@@ -81,6 +82,9 @@ protected:
 
 public:
 	void Tick(float DeltaTime) override;
+
+	// Required network setup
+	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 
 	/** Returns Mesh1P subobject **/
 	FORCEINLINE class USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
