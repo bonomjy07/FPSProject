@@ -11,7 +11,7 @@
 AFPSObjectiveActor::AFPSObjectiveActor()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -41,6 +41,13 @@ void AFPSObjectiveActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	FVector NewLocation = GetActorLocation();
+	FRotator NewRotation = GetActorRotation();
+	float RunningTime = GetGameTimeSinceCreation();
+	NewLocation.Z += 100.f * (FMath::Sin(RunningTime+DeltaTime) - FMath::Sin(RunningTime));
+	NewRotation.Yaw += 40.f * DeltaTime;
+
+	SetActorLocationAndRotation(NewLocation, NewRotation);
 }
 
 void AFPSObjectiveActor::NotifyActorBeginOverlap(AActor* OtherActor)
