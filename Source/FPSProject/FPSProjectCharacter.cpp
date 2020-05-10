@@ -55,6 +55,9 @@ AFPSProjectCharacter::AFPSProjectCharacter()
 
 	// Create a noise emitter component
 	NoiseEmitterComponent = CreateDefaultSubobject<UPawnNoiseEmitterComponent>(TEXT("NoiseEmitter"));
+
+	// Set its pitch affected by controller
+	bUseControllerRotationPitch = true;
 }
 
 void AFPSProjectCharacter::BeginPlay()
