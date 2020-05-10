@@ -27,14 +27,17 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	class UPawnSensingComponent* PawnSensingComp;
 
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	UPROPERTY(EditInstanceOnly, Category = "AI")
+	bool bIsOnPatrol;
 
-	UFUNCTION()
-	void OnPawnSeen(APawn* SeenPawn);
+	UPROPERTY()
+	AActor* CurrentPatrol;
 
-	UFUNCTION()
-	void OnNoiseHeard(APawn* NoiseInstigator, const FVector& Location, float Volume);
+	UPROPERTY(EditInstanceOnly, Category = "AI")
+	AActor* FirstPatrolPoint;
+
+	UPROPERTY(EditInstanceOnly, Category = "AI")
+	AActor* SecondPatrolPoint;
 
 	// It's used to make AI look where it was looking at
 	FRotator OriginalRotation;
@@ -42,22 +45,30 @@ protected:
 	// Timer for resetting AI's rotation
 	FTimerHandle RotationTimer;
 
+	// This represetns guard state
+	EAIGuardState GuardState;
+
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
 	// Called when the AI heard noise after 3 seconds
 	UFUNCTION()
 	void ResetOriginalRotation();
 
-	// This represetns guard state
-	EAIGuardState GuardState;
+	UFUNCTION()
+	void OnPawnSeen(APawn* SeenPawn);
+
+	UFUNCTION()
+	void OnNoiseHeard(APawn* NoiseInstigator, const FVector& Location, float Volume);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "AI")
 	void OnGuardStateChanged(EAIGuardState NewGuardState);
 
+	void MoveToNextPoint();
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	// Setter for guard state
 	void SetGuardState(EAIGuardState NewGuardState);
