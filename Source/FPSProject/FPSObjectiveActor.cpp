@@ -22,6 +22,7 @@ AFPSObjectiveActor::AFPSObjectiveActor()
 	SphereComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 	SphereComponent->SetupAttachment(MeshComponent);
 
+	// Set it replicate
 	bReplicates = true;
 	bReplicateMovement = true;
 }
@@ -44,6 +45,7 @@ void AFPSObjectiveActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// ObjectiveActor is floating
 	if (Role == ROLE_Authority)
 	{
 		FVector NewLocation = GetActorLocation();
