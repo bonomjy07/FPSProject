@@ -27,15 +27,11 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	class UPawnSensingComponent* PawnSensingComp;
 
-	UPROPERTY(EditInstanceOnly, Category = "AI")
-	bool bIsOnPatrol;
-
-	UPROPERTY()
-	AActor* CurrentPatrol;
-
+	// Patrol point1.
 	UPROPERTY(EditInstanceOnly, Category = "AI")
 	AActor* FirstPatrolPoint;
 
+	// Patrol point2.
 	UPROPERTY(EditInstanceOnly, Category = "AI")
 	AActor* SecondPatrolPoint;
 
@@ -46,10 +42,13 @@ protected:
 	FTimerHandle RotationTimer;
 
 	// This represetns guard state
+	UPROPERTY(ReplicatedUsing = OnRep_GuardState)
 	EAIGuardState GuardState;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	virtual void GetLifetimeReplicatedProps(TArray < FLifetimeProperty >& OutLifetimeProps) const override;
 
 	// Called when the AI heard noise after 3 seconds
 	UFUNCTION()
@@ -61,10 +60,13 @@ protected:
 	UFUNCTION()
 	void OnNoiseHeard(APawn* NoiseInstigator, const FVector& Location, float Volume);
 
+	// Display the widget that what AI's state is.
 	UFUNCTION(BlueprintImplementableEvent, Category = "AI")
 	void OnGuardStateChanged(EAIGuardState NewGuardState);
 
-	void MoveToNextPoint();
+	// Called on client side when GuardState is changed 
+	UFUNCTION()
+	void OnRep_GuardState();
 
 public:	
 	// Called every frame

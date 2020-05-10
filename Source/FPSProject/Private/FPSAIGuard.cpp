@@ -10,6 +10,7 @@
 #include "AIController.h"
 #include "FPSAIGuardController.h"
 #include "NavigationSystem.h"
+#include "Net/UnrealNetwork.h"
 //#include "Blueprint/AIBlueprintHelperLibrary.h"
 
 // Sets default values
@@ -25,8 +26,6 @@ AFPSAIGuard::AFPSAIGuard()
 
 	// Set default guard state
 	GuardState = EAIGuardState::Idle;
-
-	bIsOnPatrol = true;
 }
 
 // Called when the game starts or when spawned
@@ -34,39 +33,33 @@ void AFPSAIGuard::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Save the its orginal rotation
-	OriginalRotation = GetActorRotation();
-
-//	if (bIsOnPatrol)
-//	{
-//		MoveToNextPoint();
-//	}
-//
-	// Pass the patrols actors to controller
-	AFPSAIGuardController* AC = Cast<AFPSAIGuardController>(GetController());
-	if (AC)
+	if (Role == ROLE_Authority)
 	{
-		AC->TargetActor1 = FirstPatrolPoint;
-		AC->TargetActor2 = SecondPatrolPoint;
-		AC->GoToNextTargetPoint();
+		// Save the its orginal rotation
+		OriginalRotation = GetActorRotation();
+
+		// Pass the patrols actors to controller
+		AFPSAIGuardController* AC = Cast<AFPSAIGuardController>(GetController());
+		if (AC)
+		{
+			AC->TargetActor1 = FirstPatrolPoint;
+			AC->TargetActor2 = SecondPatrolPoint;
+			AC->GoToNextTargetPoint();
+		}
 	}
+}
+
+void AFPSAIGuard::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AFPSAIGuard, GuardState);
 }
 
 // Called every frame
 void AFPSAIGuard::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-//	if (CurrentPatrol)
-//	{
-//		FVector Delta = GetActorLocation() - CurrentPatrol->GetActorLocation();
-//		float DistanceToGoal = Delta.Size();
-//
-//		if (DistanceToGoal < 100.f)
-//		{
-//			MoveToNextPoint();
-//		}
-//	}
 }
 
 void AFPSAIGuard::ResetOriginalRotation()
@@ -77,19 +70,18 @@ void AFPSAIGuard::ResetOriginalRotation()
 		return;
 	}
 
+	// Reset actor's rotation
 	SetActorRotation(OriginalRotation);
 
+	// Reset actor's gaurd-state
 	SetGuardState(EAIGuardState::Idle);
 
+	// Continue to move again
 	AFPSAIGuardController* AC = Cast<AFPSAIGuardController>(GetController());
 	if (AC)
 	{
 		AC->GoToNextTargetPoint();
 	}
-//	if (bIsOnPatrol)
-//	{
-//		MoveToNextPoint();
-//	}
 }
 
 void AFPSAIGuard::OnPawnSeen(APawn* SeenPawn)
@@ -113,15 +105,10 @@ void AFPSAIGuard::OnPawnSeen(APawn* SeenPawn)
 		}
 	}
 
-	// New state is alert
+	// Set A.I's state 'Alert'
 	SetGuardState(EAIGuardState::Alert);
 
-//	// Stop movement if it's patrolling
-//	AAIController* AC = Cast<AAIController>(GetController());
-//	if (AC)
-//	{
-//		AC->StopMovement();
-//	}
+	// Stop movement
 	AFPSAIGuardController* AC = Cast<AFPSAIGuardController>(GetController());
 	if (AC)
 	{
@@ -155,13 +142,6 @@ void AFPSAIGuard::OnNoiseHeard(APawn* NoiseInstigator, const FVector& Location, 
 	// New state is suspicious
 	SetGuardState(EAIGuardState::Suspicious);
 
-//	// Stop movement if it's patrolling
-//	AAIController* AC = Cast<AAIController>(GetController());
-//	if (AC)
-//	{
-//		AC->StopMovement();
-//	}
-
 	AFPSAIGuardController* AC = Cast<AFPSAIGuardController>(GetController());
 	if (AC)
 	{
@@ -171,27 +151,37 @@ void AFPSAIGuard::OnNoiseHeard(APawn* NoiseInstigator, const FVector& Location, 
 
 void AFPSAIGuard::SetGuardState(EAIGuardState NewGuardState)
 {
-	GuardState = NewGuardState;
+	if (Role == ROLE_Authority)
+	{
+		GuardState = NewGuardState;
 
-	OnGuardStateChanged(NewGuardState);
+		OnRep_GuardState(); // Fake function call for server-side
+		//OnGuardStateChanged(NewGuardState);
+	}
 }
 
-void AFPSAIGuard::MoveToNextPoint()
+void AFPSAIGuard::OnRep_GuardState()
 {
-	if (CurrentPatrol == nullptr || CurrentPatrol == SecondPatrolPoint)
-	{
-		CurrentPatrol = FirstPatrolPoint;
-	}
-	else
-	{
-		CurrentPatrol = SecondPatrolPoint;
-	}
-
-	AAIController* AC = Cast<AAIController>(GetController());
-	if (AC)
-	{
-		AC->MoveToActor(CurrentPatrol);
-	}
-	//UAIBlueprintHelperLibrary::SimpleMoveToActor(GetController(), CurrentPatrol);
+	OnGuardStateChanged(GuardState);
 }
 
+//void AFPSAIGuard::MoveToNextPoint()
+//{
+//	if (CurrentPatrol == nullptr || CurrentPatrol == SecondPatrolPoint)
+//	{
+//		CurrentPatrol = FirstPatrolPoint;
+//	}
+//	else
+//	{
+//		CurrentPatrol = SecondPatrolPoint;
+//	}
+//
+//	AAIController* AC = Cast<AAIController>(GetController());
+//	if (AC)
+//	{
+//		AC->MoveToActor(CurrentPatrol);
+//	}
+//	//UAIBlueprintHelperLibrary::SimpleMoveToActor(GetController(), CurrentPatrol);
+//}
+//
+//
