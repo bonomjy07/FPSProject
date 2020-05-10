@@ -8,8 +8,6 @@
 
 /**
  * 
- * 사용하지 말 것.
- * 망작.
  */
 UCLASS()
 class FPSPROJECT_API AFPSAIGuardController : public AAIController
@@ -20,12 +18,15 @@ class FPSPROJECT_API AFPSAIGuardController : public AAIController
 	AActor* CurrentTarget;
 
 public:
+	// Patrol point 1.
 	UPROPERTY()
 	AActor* TargetActor1;
 
+	// Patrol point 2.
 	UPROPERTY()
 	AActor* TargetActor2;
 
+	// Patrol area between point1 and point2
 	void GoToNextTargetPoint();
 
 protected:
