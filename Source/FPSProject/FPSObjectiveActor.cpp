@@ -21,6 +21,9 @@ AFPSObjectiveActor::AFPSObjectiveActor()
 	SphereComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	SphereComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 	SphereComponent->SetupAttachment(MeshComponent);
+
+	bReplicates = true;
+	bReplicateMovement = true;
 }
 
 // Called when the game starts or when spawned
@@ -41,13 +44,16 @@ void AFPSObjectiveActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	FVector NewLocation = GetActorLocation();
-	FRotator NewRotation = GetActorRotation();
-	float RunningTime = GetGameTimeSinceCreation();
-	NewLocation.Z += 100.f * (FMath::Sin(RunningTime+DeltaTime) - FMath::Sin(RunningTime));
-	NewRotation.Yaw += 40.f * DeltaTime;
+	if (Role == ROLE_Authority)
+	{
+		FVector NewLocation = GetActorLocation();
+		FRotator NewRotation = GetActorRotation();
+		float RunningTime = GetGameTimeSinceCreation();
+		NewLocation.Z += 100.f * (FMath::Sin(RunningTime + DeltaTime) - FMath::Sin(RunningTime));
+		NewRotation.Yaw += 40.f * DeltaTime;
 
-	SetActorLocationAndRotation(NewLocation, NewRotation);
+		SetActorLocationAndRotation(NewLocation, NewRotation);
+	}
 }
 
 void AFPSObjectiveActor::NotifyActorBeginOverlap(AActor* OtherActor)
@@ -56,13 +62,15 @@ void AFPSObjectiveActor::NotifyActorBeginOverlap(AActor* OtherActor)
 
 	PlayEffect();
 
-	AFPSProjectCharacter* MyCharacter = Cast<AFPSProjectCharacter>(OtherActor);
-	if (MyCharacter)
+	if (Role == ROLE_Authority)
 	{
-		MyCharacter->bIsCarryObjective = true;
+		AFPSProjectCharacter* MyCharacter = Cast<AFPSProjectCharacter>(OtherActor);
+		if (MyCharacter)
+		{
+			MyCharacter->bIsCarryObjective = true;
 
-		Destroy();
+			Destroy();
+		}
 	}
-
 }
 
