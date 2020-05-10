@@ -55,9 +55,6 @@ AFPSProjectCharacter::AFPSProjectCharacter()
 
 	// Create a noise emitter component
 	NoiseEmitterComponent = CreateDefaultSubobject<UPawnNoiseEmitterComponent>(TEXT("NoiseEmitter"));
-
-	bReplicateMovement = true;
-	bReplicates = true;
 }
 
 void AFPSProjectCharacter::BeginPlay()
@@ -95,6 +92,11 @@ void AFPSProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 	// "turnrate" is for devices that we choose to treat as a rate of change, such as an analog joystick
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
+}
+
+void AFPSProjectCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
 }
 
 void AFPSProjectCharacter::OnFire()
