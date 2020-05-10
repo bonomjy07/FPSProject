@@ -55,6 +55,9 @@ AFPSProjectCharacter::AFPSProjectCharacter()
 
 	// Create a noise emitter component
 	NoiseEmitterComponent = CreateDefaultSubobject<UPawnNoiseEmitterComponent>(TEXT("NoiseEmitter"));
+
+	bReplicateMovement = true;
+	bReplicates = true;
 }
 
 void AFPSProjectCharacter::BeginPlay()
