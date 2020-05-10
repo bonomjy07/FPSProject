@@ -99,6 +99,48 @@ void AFPSProjectCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 
 void AFPSProjectCharacter::OnFire()
 {
+	ServerOnFire();
+
+//	// try and fire a projectile
+//	if (ProjectileClass != NULL)
+//	{
+//		UWorld* const World = GetWorld();
+//		if (World != NULL)
+//		{
+//			const FRotator SpawnRotation = GetControlRotation();
+//			// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
+//			const FVector SpawnLocation = ((FP_MuzzleLocation != nullptr) ? FP_MuzzleLocation->GetComponentLocation() : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
+//
+//			//Set Spawn Collision Handling Override
+//			FActorSpawnParameters ActorSpawnParams;
+//			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+//			ActorSpawnParams.Instigator = this;
+//
+//			// spawn the projectile at the muzzle
+//			World->SpawnActor<AFPSProjectProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+//		}
+//	}
+
+	// try and play the sound if specified
+	if (FireSound != NULL)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+	}
+
+	// try and play a firing animation if specified
+	if (FireAnimation != NULL)
+	{
+		// Get the animation object for the arms mesh
+		UAnimInstance* AnimInstance = Mesh1P->GetAnimInstance();
+		if (AnimInstance != NULL)
+		{
+			AnimInstance->Montage_Play(FireAnimation, 1.f);
+		}
+	}
+}
+
+void AFPSProjectCharacter::ServerOnFire_Implementation()
+{
 	// try and fire a projectile
 	if (ProjectileClass != NULL)
 	{
@@ -118,23 +160,11 @@ void AFPSProjectCharacter::OnFire()
 			World->SpawnActor<AFPSProjectProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
 		}
 	}
+}
 
-	// try and play the sound if specified
-	if (FireSound != NULL)
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
-	}
-
-	// try and play a firing animation if specified
-	if (FireAnimation != NULL)
-	{
-		// Get the animation object for the arms mesh
-		UAnimInstance* AnimInstance = Mesh1P->GetAnimInstance();
-		if (AnimInstance != NULL)
-		{
-			AnimInstance->Montage_Play(FireAnimation, 1.f);
-		}
-	}
+bool AFPSProjectCharacter::ServerOnFire_Validate()
+{
+	return true;
 }
 
 void AFPSProjectCharacter::MoveForward(float Value)

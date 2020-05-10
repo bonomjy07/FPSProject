@@ -63,6 +63,11 @@ protected:
 	/** Fires a projectile. */
 	void OnFire();
 
+	/** Server function for OnFire() */
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerOnFire();
+	void ServerOnFire_Implementation();
+
 	/** Handles moving forward/backward */
 	void MoveForward(float Val);
 
